@@ -14,3 +14,9 @@
 *.lai
 *.la
 *.a
+
+TAGS
+libtsm.*
+*_test
+tsm
+
