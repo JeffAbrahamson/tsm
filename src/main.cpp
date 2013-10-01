@@ -84,7 +84,9 @@ namespace {
                         ("plot,p",
                          "Plot data.")
                         ("text-dump,f",
-                         "Display full data, tab-separated.");
+                         "Output time series as text, tab-separated.")
+                        ("list-series",
+                         "Output the time series we know about.");
 
                 BPO::options_description test("Test options (don't use except for regression tests)"); 
                 test.add_options()
@@ -104,7 +106,7 @@ namespace {
                 BPO::notify(opt_map);
 
                 if(opt_map.count("help")) {
-                        cout << "tsm <options> [data-point]" << endl << endl;
+                        cout << "tsm <options> [time-series-name] [data-point]" << endl << endl;
                         cout << "  To add a new point, specify the database and the point value.";
                         cout << endl;
                 
