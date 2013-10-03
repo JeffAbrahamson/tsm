@@ -98,7 +98,7 @@ namespace {
 
                 BPO::options_description matching("Matching");
                 matching.add_options()
-                        ("time,t", BPO::value<string>(),
+                        ("time,t", BPO::value<string>()->default_value("0"),
                          "Specify the date or time to which the current operation applies.")
                         ("begin", BPO::value<string>(),
                          "Specify the beginning of a date or time range for data retrieval.")
@@ -179,38 +179,69 @@ int main(int argc, char *argv[])
                 cout << "value, value=" << options["value"].as<double>() << endl;
         if(options.count("modify")) {
                 cout << "modify, value=" << options["modify"].as<double>() << endl;
+                // Open db.
+                // Check if (time, value) exists.
+                // If so, modify it.  If not quiet, emit message about change.
+                // If not and not quiet, add it and emit message.
+                // If not and quiet, don't modify but emit error.
                 return 0;
         }
         if(options.count("add")) {
                 cout << "add, value=" << options["add"].as<double>() << endl;
+                // Open db.
+                // Check if (time, value) exists.
+                // If not, add it.
+                // If so and not quiet, add it and emit message about change.
+                // If so and quiet, don't add but emit error.
                 return 0;
         }
         if(options.count("delete")) {
                 cout << "delete, date/time=" << options["delete"].as<string>() << endl;
+                // Open db.
+                // Check if time point exists.
+                // If yes, delete it.  If not quiet, note old value.
+                // If not, error.
                 return 0;
         }
         if(options.count("create")) {
                 cout << "create, name=" << options["create"].as<string>() << endl;
+                // Check if db exists.
+                // If not, create it.
+                // Else error.
                 return 0;
         }
         if(options.count("import")) {
                 cout << "import, value=" << options["import"].as<string>() << endl;
+                // Read and parse file.
+                // If format is bad, report any errors and exit.
+                // Open db.
+                // Add data.
                 return 0;
         }
         if(options.count("validate")) {
                 cout << "validate" << endl;
+                // If a db is specified, use it.  Otherwise, discover all db's.
+                // For each db, print name and validate.
                 return 0;
         }
         if(options.count("plot")) {
                 cout << "plot" << endl;
+                // Open db.
+                // Plot the data.
+                // Note that somehow I need to be able to specify plot command (DSL) or derived series.
+                // This command may be merely for plotting default series from one db.
                 return 0;
         }
         if(options.count("text-dump")) {
                 cout << "text-dump" << endl;
+                // Open db.
+                // Print the data to stdout.
                 return 0;
         }
         if(options.count("list-series")) {
                 cout << "list-series" << endl;
+                // Discover all db's.
+                // Print their names to stdout.
                 return 0;
         }
         
