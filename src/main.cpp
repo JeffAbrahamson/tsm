@@ -62,8 +62,10 @@ namespace {
                          "Produce help message")
                         ("read-only,R",
                          "Read-only, do not persist data")
-                        ("database-dir", BPO::value<string>(),
-                         "Name of directory to use for database instead of default")
+                        ("basedir", BPO::value<string>(),
+                         "Name of base directory in which to find databases")
+                        ("dbname", BPO::value<string>(),
+                         "Time series name.  May also be specified as first positional argument.")
                         ("verbose,v",
                          "Emit extra information")
                         ("debug",
@@ -74,16 +76,23 @@ namespace {
                 BPO::options_description actions("Actions (if none, add data point)");
                 actions.add_options()
                         ("modify", BPO::value<double>(),
-                         "Modify data point.  Except in quiet mode, it is enough "
-                         "to add a data value for an existing time point.")
-                        ("delete,x",
-                         "Delete data point")
+                         "Modify an existing data point with value arg.  Uses the current date or time"
+                         "unless specified with --time.  Except in quiet mode, "
+                         "it is enough to add a data value for an existing time point.")
+                        ("add", BPO::value<double>(),
+                         "Add a new data point with value arg.  Uses the current date or time"
+                         "unless specified with --time.  Except in quiet mode, "
+                         "it is enough to add a data value for an existing time point.")
+                        ("delete,x", BPO::value<string>(),
+                         "Delete data point at date or time arg")
                         ("create", BPO::value<string>(),
                          "Create new database.")
                         ("import", BPO::value<string>(),
                          "Import a text file.  The format is the same as that output "
-                         "by -f:  each line must a date or time followed by whitespace "
-                         "followed by a value.")
+                         "by --text-dump:  each line must be a date or time followed by"
+                         "whitespace followed by a value.")
+                        ("value", BPO::value<double>(),
+                         "Value of new or modified point.  May also be specified as second positional argument.")
                         ("validate,V",
                          "Confirm that all databases are loadable and consistent");
 
@@ -100,7 +109,7 @@ namespace {
                 output.add_options()
                         ("plot,p",
                          "Plot data.")
-                        ("text-dump,f",
+                        ("text-dump",
                          "Output time series as text, tab-separated.")
                         ("list-series",
                          "Output the time series we know about.");
@@ -114,8 +123,8 @@ namespace {
                 options.add(general).add(actions).add(matching).add(output).add(test);
         
                 BPO::positional_options_description pos;
-                pos.add("db-name", -1);
-                pos.add("data-point", -1);
+                pos.add("dbname", 1);
+                pos.add("value", 2);
         
                 BPO::variables_map opt_map;
                 BPO::store(BPO::command_line_parser(argc, argv).options(options).positional(pos).run(),
@@ -158,6 +167,52 @@ int main(int argc, char *argv[])
         // Scaffolding for what comes next
         if(options.count("help") > 0)
                 return 0;
-
+        if(options.count("time"))
+                cout << "set time, value=" << options["time"].as<string>() << endl;
+        if(options.count("begin"))
+                cout << "set begin time, value=" << options["begin"].as<string>() << endl;
+        if(options.count("end"))
+                cout << "set end time, value=" << options["end"].as<string>() << endl;
+        if(options.count("dbname"))
+                cout << "dbname, value=" << options["dbname"].as<string>() << endl;
+        if(options.count("value"))
+                cout << "value, value=" << options["value"].as<double>() << endl;
+        if(options.count("modify")) {
+                cout << "modify, value=" << options["modify"].as<double>() << endl;
+                return 0;
+        }
+        if(options.count("add")) {
+                cout << "add, value=" << options["add"].as<double>() << endl;
+                return 0;
+        }
+        if(options.count("delete")) {
+                cout << "delete, date/time=" << options["delete"].as<string>() << endl;
+                return 0;
+        }
+        if(options.count("create")) {
+                cout << "create, name=" << options["create"].as<string>() << endl;
+                return 0;
+        }
+        if(options.count("import")) {
+                cout << "import, value=" << options["import"].as<string>() << endl;
+                return 0;
+        }
+        if(options.count("validate")) {
+                cout << "validate" << endl;
+                return 0;
+        }
+        if(options.count("plot")) {
+                cout << "plot" << endl;
+                return 0;
+        }
+        if(options.count("text-dump")) {
+                cout << "text-dump" << endl;
+                return 0;
+        }
+        if(options.count("list-series")) {
+                cout << "list-series" << endl;
+                return 0;
+        }
+        
         return 0;
 }
