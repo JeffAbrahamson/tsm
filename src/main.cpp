@@ -23,6 +23,8 @@
 #include <iostream>
 #include <string>
 
+#include "mode.h"
+
 
 using std::cerr;
 using std::cout;
@@ -30,6 +32,7 @@ using std::endl;
 using std::exception;
 using std::string;
 
+using tsm::Mode;
 
 namespace BPO = boost::program_options;
 
@@ -38,12 +41,22 @@ class help_exception : public exception {};
 
 namespace {
 
-        BPO::variables_map parse_options(int, char *[]);
+        // Set mode flags.
+        // This is the part of responding to the commandline that
+        // is global, i.e., does not need to be done in main().
+        void set_flags(BPO::variables_map &options)
+        {
+                mode(Mode::Verbose, options.count("verbose") > 0);
+                mode(Mode::Quiet, options.count("quiet") > 0);
+                mode(Mode::Testing, options.count("TEST") > 0);
+                mode(Mode::Debug, options.count("debug") > 0);
+                mode(Mode::ReadOnly, options.count("read-only") > 0);
+        }
 
-
+        // Parse the commandline.
         BPO::variables_map parse_options(int argc, char *argv[])
         {
-                BPO::options_description general("General options");
+                BPO::options_description general("General");
                 general.add_options()
                         ("help,h",
                          "Produce help message")
@@ -52,7 +65,11 @@ namespace {
                         ("database-dir", BPO::value<string>(),
                          "Name of directory to use for database instead of default")
                         ("verbose,v",
-                         "Emit debugging information");
+                         "Emit extra information")
+                        ("debug",
+                         "Emit debugging information")
+                        ("quiet,q",
+                         "Emit no information apart status code.  Some warnings become errors.");
 
                 BPO::options_description actions("Actions (if none, add data point)");
                 actions.add_options()
@@ -70,7 +87,7 @@ namespace {
                         ("validate,V",
                          "Confirm that all databases are loadable and consistent");
 
-                BPO::options_description matching("Matching options");
+                BPO::options_description matching("Matching");
                 matching.add_options()
                         ("time,t", BPO::value<string>(),
                          "Specify the date or time to which the current operation applies.")
@@ -79,7 +96,7 @@ namespace {
                         ("end", BPO::value<string>(),
                          "Specify the end of a date or time range for data retrieval.");
 
-                BPO::options_description output("Output options");
+                BPO::options_description output("Output");
                 output.add_options()
                         ("plot,p",
                          "Plot data.")
@@ -90,7 +107,7 @@ namespace {
 
                 BPO::options_description test("Test options (don't use except for regression tests)"); 
                 test.add_options()
-                        ("TEST", BPO::value<string>(),
+                        ("TEST",
                          "Test mode, use local data directory");
         
                 BPO::options_description options("Allowed options");
@@ -108,12 +125,12 @@ namespace {
                 if(opt_map.count("help")) {
                         cout << "tsm <options> [time-series-name] [data-point]" << endl << endl;
                         cout << "  To add a new point, specify the database and the point value.";
-                        cout << endl;
+                        cout << endl << endl;
                 
                         cout << options << endl;
-                        throw help_exception();
                 }
-        
+
+                set_flags(opt_map);
                 return opt_map;
         }
 
@@ -129,9 +146,6 @@ int main(int argc, char *argv[])
         try {
                 options = parse_options(argc, argv);
         }
-        catch(help_exception) {
-                return 0;       // User asked for help, done
-        }
         catch(exception& e) {
                 // Something went wrong.  Say so and exit with error.
                 cerr << e.what() << endl;
@@ -139,5 +153,11 @@ int main(int argc, char *argv[])
                 cerr << "(Error is fatal, quitting before doing anything.)" << endl;
                 return 1;
         }
+
+
+        // Scaffolding for what comes next
+        if(options.count("help") > 0)
+                return 0;
+
         return 0;
 }
