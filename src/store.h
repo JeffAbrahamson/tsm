@@ -28,6 +28,7 @@ namespace tsm {
         class Series;
 
         class Store {
+        public:
                 // Takes ownership of the database pointer.
                 Store(Database *db);
                 ~Store();
@@ -37,6 +38,9 @@ namespace tsm {
                 // Can throw OutofTemporalRange, StorageError.
                 template<typename T> double get(T when);
                 template<typename T> Series get(T begin, T end);
+
+        private:
+                std::unique_ptr<Database> db_;
         };
 
 } /* namespace tsm */
