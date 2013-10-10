@@ -3,7 +3,9 @@ GCC = g++ -ggdb3 -Wall -std=c++0x
 SRC = 			\
 	mode.cpp	\
 
-HEADER = mode.h
+HEADER = 		\
+	mode.h		\
+	store.h		\
 
 OBJECT = $(SRC:%.cpp=%.o)
 
@@ -56,6 +58,7 @@ libpytsm.so : $(OBJECT) python.o
 
 TESTS = 			\
 	mode_test 		\
+	header_test		\
 
 test : $(TESTS)
 	./test.sh
@@ -63,6 +66,9 @@ test : $(TESTS)
 %_test : %_test.o mode.o $(OBJECT)
 	$(GCC) -o $@ $^ $(LIBS)
 	-./$@
+
+header_test :
+	./build-test-header
 
 clean :
 	rm -f $(OBJECT) *.o *~ tsm TAGS *_test libtsm*
