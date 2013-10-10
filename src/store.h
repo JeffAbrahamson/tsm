@@ -18,6 +18,8 @@
 */
 
 
+#include <memory>
+
 
 #ifndef __STORE_H__
 #define __STORE_H__ 1
