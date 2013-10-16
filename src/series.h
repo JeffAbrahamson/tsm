@@ -31,37 +31,40 @@ namespace tsm {
         template<typename T>
         class Series {
         public:
-                class TPtr {
-                public:
-                        // TODO: TPtr is a sort of a pointer to a T,
-                        // but at the same time it is tightly bound to
-                        // its Series so that it can know if its range is valid,
-                        // as well as to know the next() actual temporal point.
-                        TPtr();
-                        ~TPtr();
-
-                        T when();
-                        double value();
-                        // next() moves to the next defined point.
-                        // operator++() moves to the next possible point, interpolating if necessary.
-                        TPtr next();
-                        TPtr operator++();
-                        bool valid();
-                };
-                
-        public:
                 // TODO: pass default interpolator to constructor?
+                // TODO: Somehow provide the series with its data!
+                //       We shouldn't have to pull everything from the
+                //       store, but rather the store should back the series.
                 Series();
                 ~Series();
 
-                std::vector<std::string> names();
-                TPtr first(std::string name);
-                // Note that when need not be a temporal point in the series:
-                // value() interpolates between neighboring points if needed.
-                double value(std::string name, T when);
+                // Return true if the series is empty (has no points).
+                bool empty() const;
+                
+                // Return the first time point in the series.
+                T first() const;
+
+                // Return the last time point in the series.
+                T last() const;
+
+                // Return the least time point greater than the
+                // provided time point "when".
+                T next() const;
+
+                // Note that "when" need not be a time point in the
+                // series: value() interpolates between neighboring
+                // points if needed.
+                double value(T when) const;
 
         private:
-                std::map<std::string, std::map<T, double> > series_;
+                // TODO: This is wrong.  Some series are backed
+                // directly by the store.  Other series are computed,
+                // perhaps on the fly.  Some series might cache their
+                // data as they go to avoid recomputation.  So
+                // probably I should replace this with an ABC,
+                // providing StoredSeries, CachedSeries, and
+                // ComputedSeries.
+                std::map<T, double> series_;
         };
 
 }

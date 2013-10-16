@@ -5,6 +5,8 @@ SRC = 			\
 
 HEADER = 		\
 	mode.h		\
+	series.h	\
+	series_collection.h \
 	store.h		\
 
 OBJECT = $(SRC:%.cpp=%.o)
