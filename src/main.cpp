@@ -244,6 +244,11 @@ int main(int argc, char *argv[])
                 // Print their names to stdout.
                 return 0;
         }
+
+        // No other command, so this is data input.
+        // Open db.
+        // Get input filter and validator.
+        // If validation passes, add point to database.
         
         return 0;
 }
