@@ -1,11 +1,11 @@
 tsm is a commandline tool for managing time series.
 
-A time series is a set of (date, float) pairs or a set of (time,
-float) pairs.
+A time series is a set of key-value pairs, where the key is a time or
+date and the value is a double or string.
 
 Typical time series might be daily readings of an electric meter, the
-reading on the bathroom scale in the morning, or periodic temperature
-readings.
+reading on the bathroom scale in the morning, water level in a pond,
+or periodic temperature readings.
 
 Below are the (presumed) results of running "tsm -h".
 
