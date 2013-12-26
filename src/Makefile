@@ -1,4 +1,5 @@
-GCC = g++ -ggdb3 -Wall -std=c++0x
+#CC = clang++ -ggdb3 -Wall -std=c++0x
+CC = g++ -ggdb3 -Wall -std=c++0x
 
 SRC = 			\
 	mode.cpp	\
@@ -18,13 +19,13 @@ LIBS = 				\
 all : libs tsm test TAGS
 
 %.o : %.cpp %.h
-	$(GCC) -c -fpic -o $@ $<
+	$(CC) -c -fpic -o $@ $<
 
 %.o : %.cpp
-	$(GCC) -c -fpic -o $@ $<
+	$(CC) -c -fpic -o $@ $<
 
 tsm : main.o $(HEADER) $(OBJECT) Makefile
-	$(GCC) -o tsm main.o $(OBJECT) $(LIBS)
+	$(CC) -o tsm main.o $(OBJECT) $(LIBS)
 
 libs : libtsm.so libtsm.a
 
@@ -42,19 +43,19 @@ libtsm.so : $(OBJECT)
 #
 # To build tsm from tsmlib.a:
 tsm-from-archive :
-	$(GCC) -o tsm-from-archive main.o libtsm.a $(LIBS)
+	$(CC) -o tsm-from-archive main.o libtsm.a $(LIBS)
 #
 # To build tsm from tsmlib.so:
 tsm-from-so :
-	$(GCC) -o tsm-from-so main.o -L. -ltsm $(LIBS)
+	$(CC) -o tsm-from-so main.o -L. -ltsm $(LIBS)
 #
 ############################################################
 
 python.o : python.cpp
-	$(GCC) -c -fpic -o $@ -I/usr/include/python2.6 $<
+	$(CC) -c -fpic -o $@ -I/usr/include/python2.6 $<
 
 libpytsm.so : $(OBJECT) python.o
-	$(GCC) -shared -Wl,-soname,libpytsm.so -o pytsm.so	\
+	$(CC) -shared -Wl,-soname,libpytsm.so -o pytsm.so	\
 		python.o					\
 		$(OBJECT) -lpython2.6 -lboost_python $(LIBS)
 
@@ -66,7 +67,7 @@ test : $(TESTS)
 	./test.sh
 
 %_test : %_test.o mode.o $(OBJECT)
-	$(GCC) -o $@ $^ $(LIBS)
+	$(CC) -o $@ $^ $(LIBS)
 	-./$@
 
 header_test :

@@ -58,7 +58,7 @@ namespace tsm {
                 // A map from series name to series.
                 std::map<std::string, Series<T>> collection_;
                 
-        }
+        };
 
 
         // A SeriesCollectionIterator provides forward iteration over a SeriesCollection.
@@ -76,7 +76,7 @@ namespace tsm {
                 T when() const;
 
                 // The value of the series name at this time point.
-                double value(const string &name) const;
+                double value(const std::string &name) const;
 
                 // Advance to the next time point that is defined in
                 // one of the component series.  Return true if such a
