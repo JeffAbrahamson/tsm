@@ -17,39 +17,31 @@
   along with tsm.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include <iostream>
 #include <map>
 
 #include "mode.h"
 
-
 using std::cerr;
 using std::endl;
 using std::map;
 
-
-namespace tsm {
-        static map<Mode, bool> modes;
-}
-
+namespace tsm { static map<Mode, bool> modes; }
 
 void tsm::mode(const Mode mode, const bool new_state)
 {
-        modes[mode] = new_state;
+    modes[mode] = new_state;
 }
-
 
 const bool tsm::mode(const Mode mode)
 {
-        map<Mode, bool>::const_iterator it = modes.find(mode);
-        if(it == modes.end()) {
-                cerr << "Failed to find mode " << mode << endl;
-                cerr << "This is a bug whose effects are undefined." << endl;
-                cerr << "Continuing as though the result had been false." << endl;
-                return false;
-        }
-        return it->second;
+    map<Mode, bool>::const_iterator it = modes.find(mode);
+    if(it == modes.end()) {
+	cerr << "Failed to find mode " << mode << endl;
+	cerr << "This is a bug whose effects are undefined." << endl;
+	cerr << "Continuing as though the result had been false." << endl;
+	return false;
+    }
+    return it->second;
 }
-
 

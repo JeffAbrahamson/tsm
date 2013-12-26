@@ -24,38 +24,38 @@
 
 namespace tsm {
         
-        /*
-          Maintain a map of modes.
+    /*
+      Maintain a map of modes.
 
-          Written for verbose and testing, to avoid having to pass them around
-          everywhere in case we need them deep down.  Especially verbose.
-        */
+      Written for verbose and testing, to avoid having to pass them around
+      everywhere in case we need them deep down.  Especially verbose.
+    */
 
 
-        enum Mode {
-                Invalid,        /* Invalid value */
+    enum Mode {
+	Invalid,        /* Invalid value */
                 
-                Verbose,        /* Provide information that the user
-                                   might consider informative. */
-                Quiet,          /* Provide no output that is not
-                                   explicitly requested.  Some events
-                                   that might otherwise trigger
-                                   warnings may become errors. */
-                Testing,        /* The code is being run as part of a
-                                   test. */
-                Debug,          /* Emit information that might be
-                                   useful when debugging. */
-                ReadOnly,       /* Persist nothing.  In particular,
-                                   don't even try to persist anything,
-                                   since either the user has indicated
-                                   we shouldn't or we have concluded
-                                   that it may not work. */
+	Verbose,        /* Provide information that the user
+			   might consider informative. */
+	Quiet,          /* Provide no output that is not
+			   explicitly requested.  Some events
+			   that might otherwise trigger
+			   warnings may become errors. */
+	Testing,        /* The code is being run as part of a
+			   test. */
+	Debug,          /* Emit information that might be
+			   useful when debugging. */
+	ReadOnly,       /* Persist nothing.  In particular,
+			   don't even try to persist anything,
+			   since either the user has indicated
+			   we shouldn't or we have concluded
+			   that it may not work. */
                 
-                ModeError,          /* last entry */
-        };
+	ModeError,          /* last entry */
+    };
 
-        void mode(const Mode m, const bool new_state);
-        const bool mode(const Mode m);
+    void mode(const Mode m, const bool new_state);
+    const bool mode(const Mode m);
 
 }      /* namespace tsm */
 

@@ -17,63 +17,59 @@
   along with tsm.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include <iostream>
 
 #include "mode.h"
 
-
 using std::cout;
 using std::endl;
-
 using tsm::Mode;
 using tsm::mode;
 
 
 int check_mode(Mode m, bool b);
 
-
 /*
   Mode is awfully simple...
 */
 int main(int argc, char *argv[])
 {
-        cout << "Mode::Testing mode.cpp" << endl;
+    cout << "Mode::Testing mode.cpp" << endl;
 
-        int error_count = 0;
+    int error_count = 0;
 
-        mode(Mode::Verbose, false);
-        error_count += check_mode(Mode::Verbose, false);
-        mode(Mode::Verbose, true);
-        error_count += check_mode(Mode::Verbose, true);
-        mode(Mode::Verbose, false);
-        error_count += check_mode(Mode::Verbose, false);
+    mode(Mode::Verbose, false);
+    error_count += check_mode(Mode::Verbose, false);
+    mode(Mode::Verbose, true);
+    error_count += check_mode(Mode::Verbose, true);
+    mode(Mode::Verbose, false);
+    error_count += check_mode(Mode::Verbose, false);
 
-        mode(Mode::Testing, false);
-        error_count += check_mode(Mode::Testing, false);
-        mode(Mode::Testing, true);
-        error_count += check_mode(Mode::Testing, true);
-        mode(Mode::Testing, false);
-        error_count += check_mode(Mode::Testing, false);
-        mode(Mode::Testing, true);
-        mode(Mode::Testing, true);
-        mode(Mode::Testing, true);
-        error_count += check_mode(Mode::Testing, true);
+    mode(Mode::Testing, false);
+    error_count += check_mode(Mode::Testing, false);
+    mode(Mode::Testing, true);
+    error_count += check_mode(Mode::Testing, true);
+    mode(Mode::Testing, false);
+    error_count += check_mode(Mode::Testing, false);
+    mode(Mode::Testing, true);
+    mode(Mode::Testing, true);
+    mode(Mode::Testing, true);
+    error_count += check_mode(Mode::Testing, true);
                 
-        error_count += check_mode(Mode::Verbose, false);
-        mode(Mode::Verbose, false);
-        error_count += check_mode(Mode::Verbose, false);
-        mode(Mode::Verbose, true);
-        error_count += check_mode(Mode::Verbose, true);
-        mode(Mode::Verbose, false);
-        error_count += check_mode(Mode::Verbose, false);
+    error_count += check_mode(Mode::Verbose, false);
+    mode(Mode::Verbose, false);
+    error_count += check_mode(Mode::Verbose, false);
+    mode(Mode::Verbose, true);
+    error_count += check_mode(Mode::Verbose, true);
+    mode(Mode::Verbose, false);
+    error_count += check_mode(Mode::Verbose, false);
 }
 
 
 
 int check_mode(Mode the_mode, bool the_value)
 {
-        if(mode(the_mode) == the_value)
-                return 0;
-        return 1;
+    if(mode(the_mode) == the_value)
+	return 0;
+    return 1;
 }
