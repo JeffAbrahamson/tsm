@@ -17,19 +17,28 @@
   along with tsm.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include <algorithm>
 #include <boost/program_options.hpp>
-#include <stdexcept>
+#include <chrono>
 #include <iostream>
+#include <iterator>
+#include <memory>
+#include <stdexcept>
+#include <sstream>
 #include <string>
+#include <vector>
 
 #include "mode.h"
+#include "store.h"
 
 using std::cerr;
 using std::cout;
 using std::endl;
 using std::exception;
+using std::move;
 using std::string;
+using std::unique_ptr;
+using std::vector;
 using tsm::Mode;
 
 namespace BPO = boost::program_options;
@@ -63,6 +72,9 @@ namespace {
 	    ("dbname", BPO::value<string>(),
 	     "Time series name.  May also be specified as first positional argument.  "
 	     "Expect to find in --basedir unless this is a relative or absolute pathname.")
+	    ("create", BPO::value<string>(),
+	     "Create new database: arg is the key type (\"daily\" or \"continuous\"), "
+	     "a comma, and the value type (\"double\" or \"string\").")
 	    ("verbose,v",
 	     "Emit extra information")
 	    ("debug",
@@ -70,7 +82,7 @@ namespace {
 	    ("quiet,q",
 	     "Emit no information apart status code.  Some warnings become errors.");
 
-	BPO::options_description actions("Actions (if none, add data point)");
+	BPO::options_description actions("Actions (at most one; if none and no output actions, \"add\")");
 	actions.add_options()
 	    ("modify", BPO::value<double>(),
 	     "Modify an existing data point with value arg.  Uses the current date or time"
@@ -82,27 +94,25 @@ namespace {
 	     "it is enough to add a data value for an existing time point.")
 	    ("delete,x", BPO::value<string>(),
 	     "Delete data point at date or time arg")
-	    ("create", BPO::value<string>(),
-	     "Create new database.")
 	    ("import", BPO::value<string>(),
 	     "Import a text file.  The format is the same as that output "
 	     "by --text-dump:  each line must be a date or time followed by"
 	     "whitespace followed by a value.")
-	    ("value", BPO::value<double>(),
-	     "Value of new or modified point.  May also be specified as second positional argument.")
 	    ("validate,V",
 	     "Confirm that all databases are loadable and consistent");
 
-	BPO::options_description matching("Matching");
+	BPO::options_description matching("Matching (for output actions)");
 	matching.add_options()
-	    ("time,t", BPO::value<string>()->default_value("0"),
+	    ("time,t", BPO::value<string>(),
 	     "Specify the date or time to which the current operation applies.")
 	    ("begin", BPO::value<string>(),
 	     "Specify the beginning of a date or time range for data retrieval.")
 	    ("end", BPO::value<string>(),
-	     "Specify the end of a date or time range for data retrieval.");
+	     "Specify the end of a date or time range for data retrieval.")
+	    ("value", BPO::value<double>(),
+	     "Value of new or modified point.  May also be specified as second positional argument.");
 
-	BPO::options_description output("Output");
+	BPO::options_description output("Output actions (may be specified with other actions)");
 	output.add_options()
 	    ("plot,p",
 	     "Plot data.")
@@ -114,7 +124,7 @@ namespace {
 	BPO::options_description test("Test options (don't use except for regression tests)"); 
 	test.add_options()
 	    ("TEST",
-	     "Test mode, use local data directory");
+	     "Test mode, use local data directory.  Ignore --basedir.");
         
 	BPO::options_description options("Allowed options");
 	options.add(general).add(actions).add(matching).add(output).add(test);
@@ -167,8 +177,17 @@ int main(int argc, char *argv[])
     // Scaffolding for what comes next
     if(options.count("help") > 0)
 	return 0;
-    if(options.count("time"))
+    if(options.count("time")) {
 	cout << "set time, value=" << options["time"].as<string>() << endl;
+	auto seconds_since_epoch =
+	    std::chrono::duration_cast<std::chrono::seconds>(
+		std::chrono::system_clock::now().time_since_epoch());
+	cout << "seconds=" << seconds_since_epoch.count() << endl;
+	auto hours_since_epoch =
+	    std::chrono::duration_cast<std::chrono::hours>(
+		std::chrono::system_clock::now().time_since_epoch());
+	cout << "days=" << hours_since_epoch.count() / 24 << endl;
+    }
     if(options.count("begin"))
 	cout << "set begin time, value=" << options["begin"].as<string>() << endl;
     if(options.count("end"))
@@ -177,6 +196,33 @@ int main(int argc, char *argv[])
 	cout << "dbname, value=" << options["dbname"].as<string>() << endl;
     if(options.count("value"))
 	cout << "value, value=" << options["value"].as<double>() << endl;
+
+    // Open a db, creating if appropriate.
+    unique_ptr<tsm::Store> db;
+    if(options.count("create")) {
+	string create_spec(options["create"].as<string>());
+	size_t pos = create_spec.find(",");
+	assert(string::npos != pos);
+	string key_type(create_spec.substr(0, pos));
+	if(key_type != "daily" && key_type != "continuous") {
+	    cerr << "Invalid key_type: " << key_type << endl;
+	    exit(1);
+	}
+	string value_type(create_spec.substr(pos + 1));
+	if(value_type != "double" && value_type != "string") {
+	    cerr << "Invalid value_type: " << key_type << endl;
+	    exit(1);
+	}
+	cout << "create: " << key_type << " -- " << value_type << endl;
+	db = std::move(tsm::Store::NewStore(options["dbpath"].as<string>(), key_type, value_type));
+	// Create db.
+	// Else error.
+    } else {
+	// Open existing db.
+	db = move(tsm::Store::ExistingStore(options["dbpath"].as<string>()));
+    }
+    
+    // Actions we can take.
     if(options.count("modify")) {
 	cout << "modify, value=" << options["modify"].as<double>() << endl;
 	// Open db.
@@ -201,13 +247,6 @@ int main(int argc, char *argv[])
 	// Check if time point exists.
 	// If yes, delete it.  If not quiet, note old value.
 	// If not, error.
-	return 0;
-    }
-    if(options.count("create")) {
-	cout << "create, name=" << options["create"].as<string>() << endl;
-	// Check if db exists.
-	// If not, create it.
-	// Else error.
 	return 0;
     }
     if(options.count("import")) {
@@ -252,3 +291,4 @@ int main(int argc, char *argv[])
         
     return 0;
 }
+

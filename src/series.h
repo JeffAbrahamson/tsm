@@ -27,8 +27,8 @@
 namespace tsm {
 
     // T represents a date or a time.
-    template<typename T>
-        class Series {
+    template<typename K, typename V>
+    class Series {
     public:
 	// TODO: pass default interpolator to constructor?
 	// TODO: Somehow provide the series with its data!
@@ -38,22 +38,22 @@ namespace tsm {
 	~Series();
 
 	// Return true if the series is empty (has no points).
-	bool empty() const;
+	bool Empty() const;
                 
 	// Return the first time point in the series.
-	T first() const;
+	K First() const;
 
 	// Return the last time point in the series.
-	T last() const;
+	K Last() const;
 
 	// Return the least time point greater than the
 	// provided time point "when".
-	T next() const;
+	K Next() const;
 
 	// Note that "when" need not be a time point in the
 	// series: value() interpolates between neighboring
 	// points if needed.
-	double value(T when) const;
+	V Value(K when) const;
 
     private:
 	// TODO: This is wrong.  Some series are backed
@@ -63,7 +63,24 @@ namespace tsm {
 	// probably I should replace this with an ABC,
 	// providing StoredSeries, CachedSeries, and
 	// ComputedSeries.
-	std::map<T, double> series_;
+	std::map<K, double> series_;
+
+	// TODO(JMA): I have {Stored,Cached,Computed}Series.  And then
+	// it is also parameterized by key type and value type.  Which
+	// is all a bit much to do with inheritance.
+	//
+	// Maybe there's a role for templating to handle key and value
+	// type, though any class that returns a Series probably wants
+	// to be declared to return the base class unless it knows
+	// ahead of time which it's returning.
+	//
+	// The Series might have a member function that knows how to
+	// fetch data -- from another Series, from a DB, but first
+	// maybe from a cache.  Interpolation becomes a Series type
+	// that checks cache, then its underlying Series, then
+	// calculates based on what it found.  These things might be
+	// Sources (a DB, a Cache, another Series).  And a Series has
+	// a queue of Sources.
     };
 
 }  // namespace tsm

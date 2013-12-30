@@ -32,8 +32,8 @@ namespace tsm {
     template<typename T> class SeriesCollectionIterator;
 
     // T represents a date or a time.
-    template<typename T>
-        class SeriesCollection {
+    template<typename T, typename V>
+    class SeriesCollection {
     public:
 	SeriesCollection();
 	~SeriesCollection();
@@ -45,16 +45,19 @@ namespace tsm {
 	// Provide an iterator into the series in the collection.
 	SeriesCollectionIterator<T> first(std::string &name);
 
+	// TODO(JMA): This is wrong.  Some of the constuent series
+	// could map to string, some to double.
+	//
 	// Return a map of series name to value at the time
 	// point when.  "When" need not be a time point in the
 	// series: the component series will interpolate as
 	// needed, each according to its own interpolation
 	// policy.
-	std::map<std::string, double> value(T when);
+	std::map<std::string, V> value(T when);
 
     private:
 	// A map from series name to series.
-	std::map<std::string, Series<T>> collection_;
+	std::map<std::string, Series<T, V>> collection_;
                 
     };
 

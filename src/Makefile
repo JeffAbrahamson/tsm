@@ -3,6 +3,7 @@ CC = g++ -ggdb3 -Wall -std=c++0x
 
 SRC = 			\
 	mode.cpp	\
+	store.cpp	\
 
 HEADER = 		\
 	mode.h		\
@@ -15,6 +16,7 @@ OBJECT = $(SRC:%.cpp=%.o)
 LIBS = 				\
 	-lboost_program_options	\
 	-lboost_serialization	\
+	-lleveldb		\
 
 all : libs tsm test TAGS
 
