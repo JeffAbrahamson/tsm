@@ -2,8 +2,8 @@
 CC = g++ -ggdb3 -Wall -std=c++0x
 
 SRC = 			\
-	mode.cpp	\
-	store.cpp	\
+	mode.cc		\
+	db.cc		\
 
 HEADER = 		\
 	mode.h		\
@@ -11,7 +11,7 @@ HEADER = 		\
 	series_collection.h \
 	store.h		\
 
-OBJECT = $(SRC:%.cpp=%.o)
+OBJECT = $(SRC:%.cc=%.o)
 
 LIBS = 				\
 	-lboost_program_options	\
@@ -20,10 +20,10 @@ LIBS = 				\
 
 all : libs tsm test TAGS
 
-%.o : %.cpp %.h
+%.o : %.cc %.h
 	$(CC) -c -fpic -o $@ $<
 
-%.o : %.cpp
+%.o : %.cc
 	$(CC) -c -fpic -o $@ $<
 
 tsm : main.o $(HEADER) $(OBJECT) Makefile
@@ -53,7 +53,7 @@ tsm-from-so :
 #
 ############################################################
 
-python.o : python.cpp
+python.o : python.cc
 	$(CC) -c -fpic -o $@ -I/usr/include/python2.6 $<
 
 libpytsm.so : $(OBJECT) python.o
@@ -81,8 +81,8 @@ clean :
 clean-test :
 	rm -rf tsm-test-*/ test_[0-9]*\.[0-9]*
 
-TAGS : *cpp *h
-	etags *cpp *h
+TAGS : *cc *h
+	etags *cc *h
 
 
 
