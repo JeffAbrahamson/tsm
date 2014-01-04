@@ -1,15 +1,17 @@
-#CC = clang++ -ggdb3 -Wall -std=c++0x
-CC = g++ -ggdb3 -Wall -std=c++0x
+CC = clang++ -ggdb3 -Wall -std=c++0x
+#CC = g++ -ggdb3 -Wall -std=c++0x
 
 SRC = 			\
 	mode.cc		\
 	db.cc		\
+	map_type.cc	\
 
 HEADER = 		\
+	db.h		\
+	map_type.h	\
 	mode.h		\
 	series.h	\
 	series_collection.h \
-	store.h		\
 
 OBJECT = $(SRC:%.cc=%.o)
 

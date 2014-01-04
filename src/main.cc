@@ -28,8 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "db.h"
 #include "mode.h"
-#include "store.h"
 
 using std::cerr;
 using std::cout;
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 	cout << "value, value=" << options["value"].as<double>() << endl;
 
     // Open a db, creating if appropriate.
-    unique_ptr<tsm::Store> db;
+    unique_ptr<tsm::Db> db;
     if(options.count("create")) {
 	string create_spec(options["create"].as<string>());
 	size_t pos = create_spec.find(",");
@@ -214,12 +214,12 @@ int main(int argc, char *argv[])
 	    exit(1);
 	}
 	cout << "create: " << key_type << " -- " << value_type << endl;
-	db = std::move(tsm::Store::NewStore(options["dbpath"].as<string>(), key_type, value_type));
+	db = std::move(tsm::Db::NewDb(options["dbpath"].as<string>(), key_type, value_type));
 	// Create db.
 	// Else error.
     } else {
 	// Open existing db.
-	db = move(tsm::Store::ExistingStore(options["dbpath"].as<string>()));
+	db = move(tsm::Db::ExistingDb(options["dbpath"].as<string>()));
     }
     
     // Actions we can take.

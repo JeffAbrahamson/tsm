@@ -30,14 +30,14 @@ namespace tsm {
 
     // Model a data store that maps T's (time or date values) to V's
     // (double or string).
-    class Store {
+    class Db {
     public:
 	// Open an existing database.
-	static std::unique_ptr<Store> ExistingStore(const std::string& db_path);
+	static std::unique_ptr<Db> ExistingDb(const std::string& db_path);
 	// Create and open a new database.
-	static std::unique_ptr<Store> NewStore(const std::string& db_path, const std::string& key_type, const std::string& value_type);
+	static std::unique_ptr<Db> NewDb(const std::string& db_path, const std::string& key_type, const std::string& value_type);
 
-	~Store();
+	~Db();
 
 	// Set() and Get() will throw TypeError if called through an
 	// interface that is not the correct interface for the data
@@ -62,10 +62,10 @@ namespace tsm {
 	Series Get(time_t begin, time_t end);
 	Series Get(int begin, int end);
 
-	explicit Store();	// JMA JMA JMA  fake.
+	explicit Db();	// JMA JMA JMA  fake.
     private:
 	// Takes ownership of db.
-	explicit Store(leveldb::DB* db);
+	explicit Db(leveldb::DB* db);
 
 	// Set a chunk of configuration.
 	void SetConfig(const std::string& key, const std::string& value);

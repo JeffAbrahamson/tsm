@@ -22,44 +22,44 @@
 #include <memory>
 #include <string>
 
-#include "store.h"
+#include "db.h"
 
 using std::string;
 using std::unique_ptr;
 
 namespace tsm {
 
-    unique_ptr<Store> Store::ExistingStore(const std::string& db_path)
+    unique_ptr<Db> Db::ExistingDb(const std::string& db_path)
     {
 	leveldb::DB* db;
 	leveldb::Options options;
 	options.create_if_missing = false;
 	leveldb::Status status = leveldb::DB::Open(options, db_path, &db);
 	assert(status.ok());
-	unique_ptr<Store> this_store(new Store(db));
+	unique_ptr<Db> this_store(new Db(db));
 	//this_store->SetConfig("time-type", "time"); // JMA JMA JMA  
 	//this_store->SetConfig("vaue-type", "double"); // JMA JMA JMA  
 	return this_store;
     }
 
-    unique_ptr<Store> Store::NewStore(const std::string& db_path, const string& key_type, const string& value_type)
+    unique_ptr<Db> Db::NewDb(const std::string& db_path, const string& key_type, const string& value_type)
     {
 	leveldb::DB* db;
 	leveldb::Options options;
 	options.create_if_missing = true;
 	leveldb::Status status = leveldb::DB::Open(options, db_path, &db);
 	assert(status.ok());
-	unique_ptr<Store> this_store(new Store(db));
+	unique_ptr<Db> this_store(new Db(db));
 	//this_store->SetConfig("time-type", "time"); // JMA JMA JMA  
 	//this_store->SetConfig("vaue-type", "double"); // JMA JMA JMA  
 	return this_store;
     }
     
 
-    Store::Store(leveldb::DB* db) : db_(db)
+    Db::Db(leveldb::DB* db) : db_(db)
     {}
 
-    Store::~Store()
+    Db::~Db()
     {}
 
 } // namespace tsm

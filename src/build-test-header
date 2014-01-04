@@ -10,7 +10,7 @@ atexit() {
 }
     
 
-test_file=tmp_h_test_$$.cpp
+test_file=tmp_h_test_$$.cc
 test_file_o=tmp_h_test_$$.o
 for f in *.h; do
     echo Checking $f...
